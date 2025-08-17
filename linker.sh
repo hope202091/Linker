@@ -531,6 +531,21 @@ backup_template_configs() {
 
 # 检查Docker权限
 check_docker_permission() {
+    # 如果是root用户，直接使用docker命令
+    if [[ $EUID -eq 0 ]]; then
+        if docker ps >/dev/null 2>&1; then
+            export DOCKER_CMD="docker"
+            export COMPOSE_CMD="docker-compose"
+            return 0
+        else
+            log_error "Docker服务未运行或未正确安装"
+            log_info "请检查Docker安装状态: systemctl status docker"
+            log_info "尝试启动Docker服务: systemctl start docker"
+            return 1
+        fi
+    fi
+    
+    # 非root用户的权限检查
     if ! docker ps >/dev/null 2>&1; then
         if groups $USER | grep -q docker; then
             log_warn "Docker权限配置完成，但需要重新登录或执行: newgrp docker"
@@ -567,7 +582,10 @@ install_docker() {
                 sudo yum install -y docker-ce docker-ce-cli containerd.io
                 sudo systemctl start docker
                 sudo systemctl enable docker
-                sudo usermod -aG docker $USER
+                # 只有非root用户才需要加入docker组
+                if [[ $EUID -ne 0 ]]; then
+                    sudo usermod -aG docker $USER
+                fi
                 log_success "Docker安装完成"
             else
                 log_info "Docker已存在，跳过安装"
@@ -584,7 +602,10 @@ install_docker() {
                 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
                 sudo systemctl start docker
                 sudo systemctl enable docker
-                sudo usermod -aG docker $USER
+                # 只有非root用户才需要加入docker组
+                if [[ $EUID -ne 0 ]]; then
+                    sudo usermod -aG docker $USER
+                fi
                 log_success "Docker安装完成"
             else
                 log_info "Docker已存在，跳过安装"

@@ -1,0 +1,18 @@
+{
+  "tagOwners": {
+    "tag:admin": ["default@default"]
+  },
+  "hosts": {
+    "macbookpro": "10.24.0.1",
+    "macmini": "10.24.0.2",
+    "minipcn100": "10.24.0.3",
+    "arm-centos7-1": "10.24.0.4"
+  },
+  "acls": [
+    {
+      "action": "accept",
+      "src": ["*"],
+      "dst": ["*:*"]
+    }
+  ]
+}
