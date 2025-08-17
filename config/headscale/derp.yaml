@@ -1,0 +1,14 @@
+regions:
+  900:
+    regionid: 900
+    regionname: "Local DERP"
+    nodes:
+      - name: "Local DERP Server"
+        regionid: 900
+        hostname: "{{PUBLIC_IP}}"
+        stunport: 3478
+        stunonly: false
+        derpport: {{DERP_PORT}}
+        ipv4: "{{PUBLIC_IP}}"
+        insecureforhttps: true
+        forcehttp: true

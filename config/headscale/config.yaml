@@ -1,0 +1,37 @@
+server_url: http://{{PUBLIC_IP}}:{{HEADSCALE_PORT}}
+listen_addr: 0.0.0.0:8080
+
+prefixes:
+  v4: 10.24.0.0/24
+  v6: fd7a:115c:a1e0::/48
+
+grpc_listen_addr: 127.0.0.1:50443
+grpc_allow_insecure: false
+
+database:
+  type: sqlite3
+  sqlite:
+    path: /var/lib/headscale/db.sqlite
+
+noise:
+  private_key_path: /var/lib/headscale/noise_private.key
+
+dns:
+  override_local_dns: true
+  magic_dns: true
+  base_domain: headscale.local
+  nameservers:
+    global:
+      - 1.1.1.1
+      - 8.8.8.8
+  extra_records:
+    - name: "router.internal"
+      type: "A"
+      value: "{{PUBLIC_IP}}"
+
+derp:
+  urls: []
+  paths:
+    - /etc/headscale/derp.yaml
+  auto_update_enabled: false
+  update_frequency: 24h

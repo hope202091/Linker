@@ -1,0 +1,38 @@
+services:
+
+  headscale:
+    restart: on-failure
+    container_name: headscale
+    image: headscale/headscale:v0.26.1
+    ports:
+      - "{{HEADSCALE_PORT}}:8080"
+    command: serve
+    volumes:
+      - "./config/headscale:/etc/headscale/"
+      - "./data/headscale:/var/lib/headscale"
+    environment:
+      - HEADSCALE_CONFIG=/etc/headscale/config.yaml
+    networks:
+      - system_network
+
+  derp:
+    restart: always
+    container_name: headscale_derp
+    image: sparanoid/derp:sha-82c26de
+    init: true
+    ports:
+      - "{{DERP_PORT}}:80"
+      - "3478:3478/udp"
+    volumes:
+      - "./data/derp:/var/lib/derper"
+    command: sh -c "
+      derper \
+      -hostname {{PUBLIC_IP}} \
+      -a :80 \
+      -stun \
+      -verify-clients false"
+    networks:
+      - system_network
+
+networks:
+  system_network:
